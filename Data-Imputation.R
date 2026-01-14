@@ -46,10 +46,7 @@ summary(model)
 #not worth using outside of labeling data points, as such, we will not use it as
 #an integral part of any models
 
-
 #splitting up dataset into missing and non-missing
-
-
 
 missing <- subset(cancer, V7 == "?")
 notm <- subset(cancer, V7 != "?")
@@ -81,9 +78,6 @@ colnames(cancer) <- column_names
 colnames(notm) <- column_names
 colnames(missing) <- column_names
 
-
-
-
 ind <- sample(2, nrow(cancer), replace = TRUE, prob = c(.2,.80))
 #13 ? in training, 3 in testing, close to 20/80 split
 ind1 <- sample(2, nrow(notm), replace = TRUE, prob = c(.2,.80))
@@ -114,7 +108,6 @@ for(x in 1:nrow(reginput))
     )}
 }
 
-
 reginput$Bare_Nuclei <- as.integer(reginput$Bare_Nuclei)
 cor(reginput$Bare_Nuclei,reginput$Class)
 #After regression input, Bare_Nuclei correlation (notm) changed from 0.8226959 to 0.8193201
@@ -124,7 +117,6 @@ regtest <- reginput[ind==1,]
 
 #building a second test data set with an additional column to test models
 #that add an additional column for Bare_Nuclei
-
 
 #-----------------------------------input model using perturbation-------------  
 
@@ -161,7 +153,6 @@ fullper <- data.frame(rbind(perinput, notm))
 pertrain <- fullper[ind==2,]
 pertest <- fullper[ind==1,]
 
-
 #-----------------------------------input model using mean--------------  
 
 meaninput <- cancer
@@ -179,7 +170,6 @@ cor(meaninput$Bare_Nuclei,meaninput$Class)
 
 meantrain <- meaninput[ind==2,]
 meantest <- meaninput[ind==1,]
-
 
 #-----------------------------------input model using mode--------------  
 
@@ -221,13 +211,10 @@ bintest <- bininput[ind==1,]
 
 #------------not missing input-------------------------
 
-
 notmtrain <- notm[ind1==2,]
 notmtest <- notm[ind1==1,]
 
-
 #-----------------------SVM----------------------------------------------
-
 
 #regression input--------------------------------
 
@@ -286,6 +273,7 @@ sum(pred == bintest[,11]) / nrow(bintest)
 #  0.9583333
 
 #remove missing value rows input--------------------------------
+
 svmnotminput <- ksvm(as.matrix(notmtrain[,1:9]),as.factor(notmtrain[,10]),
                      type="C-svc",kernel="vanilladot",C=0.1,scaled=TRUE)
 a <- colSums(svmnotminput@xmatrix[[1]] * svmnotminput@coef[[1]])
@@ -311,6 +299,7 @@ sum(pred == pertest[,10]) / nrow(pertest)
 # 0.9583333
 
 #------------------------------------Logistic Regression------------------------
+
 #regression-------------
 
 regmodel <- lm(Class ~., data = regtrain)
@@ -360,6 +349,7 @@ cmatrix <- as.matrix(table(ythresh, modetest$Class))
 #  0.9583333
 
 #Mean-------------
+
 lmmeanmod <- glm(formula = Class ~ Clump_Thickness + Uniformity_Cell_Size + Uniformity_Cell_Shape + Bare_Nuclei + Bland_Chromatin + Normal_Nucleoli, 
                  family="binomial"(link="logit"),
                  data = meantrain)
@@ -379,6 +369,7 @@ cmatrix
 # 0.9583333
 
 #not missing-------------
+
 notmodel <- lm(Class ~., data = notmtrain)
 summary(notmodel) # 0.8326 
 
@@ -403,8 +394,8 @@ cmatrix
 (cmatrix[1] + cmatrix[2,2])/(cmatrix[1]+cmatrix[1,2]+cmatrix[2,1] + cmatrix[2,2])
 # 0.9593496
 
-
 #binary values------------------
+
 binmodel <- lm(Class ~., data = bintrain)
 summary(binmodel) #0.8452
 
@@ -430,6 +421,7 @@ cmatrix
 #  0.9513889
 
 #Perturbation------------------
+
 permodel <- lm(Class ~., data = pertrain)
 summary(permodel) #0.8452
 
@@ -527,5 +519,3 @@ ggplot(plot_data, aes(x = reorder(Method, -Accuracy), y = Accuracy, fill = Model
     panel.grid.minor = element_blank(),
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
-
-
