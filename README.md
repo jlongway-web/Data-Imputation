@@ -1,5 +1,5 @@
-# Data-Imputation
-Comparison of data imputation methods for SVM and LR models 
+## Data-Imputation
+Comparison of data imputation methods for SVM and LR models
 
 I evaluated two different classification algorithms across six imputation methods. 
 
